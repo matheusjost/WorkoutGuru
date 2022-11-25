@@ -1,8 +1,12 @@
 #include <stdio.h>
-#include <locale.h>
 #include <stdlib.h>
-#include <sqlite3.h>
+#include "sqlite-amalgamation-3400000\sqlite3.h"
 
-void read_database(){
-	SQLITE *db = sqlite_open("drillings_guru.db", db)
+int main(){
+	sqlite3 *db;
+	int exit = 0;
+	
+	exit = sqlite3_open("workout_guru.db", &db);
+	
+    return (0);
 }

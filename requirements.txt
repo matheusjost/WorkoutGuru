@@ -1,0 +1,1 @@
+INSTALL sqlite3.h

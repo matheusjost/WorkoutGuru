@@ -2,11 +2,25 @@
 #include <string.h>
 #include <locale.h>
 #include <stdlib.h>
-#include <conio.h>
+#include "data.h"
 
-FILE *p;
-//teste
-void first_menu(){
+char menu_workout(){
+	printf("================================================\n");
+	printf("|                 WORKOUT GURU                 |\n");
+	printf("| [1] TESTE                                    |\n");
+	printf("| [2] Banco de dados [ADM]                     |\n");
+	printf("| [0] Sair                                     |\n");
+	printf("================================================\n");
+	
+	select_perguntas();
+}
+
+char clicou_treino(){
+	return '1';
+	
+}
+
+void menu_principal(){
 	char op;
 	
 	printf("================================================\n");
@@ -16,39 +30,29 @@ void first_menu(){
 	printf("| [0] Sair                                     |\n");
 	printf("================================================\n");
 	
-	op = getche();
-	system("cls");
+	op = clicou_treino();
 	
 	switch(op){
 		case '0':
 			exit(0);
 		case '1':
-			workout_menu();
+			menu_workout();
 			break;
 		case '2':
 			break;
 	}
-	
 }
 
-void workout_menu(){
-	printf("================================================\n");
-	printf("|                 WORKOUT GURU                 |\n");
-	printf("| [1] Consultar Treinos                        |\n");
-	printf("| [2] Criar Treino                             |\n");
-	printf("| [3] Excluir Treino                           |\n");
-	printf("| [0] Voltar                                   |\n");
-	printf("================================================\n");
-}
-
-void get_answers(){
+void get_perguntas(){
 	
 }
 
 int main (void){
 	setlocale(LC_ALL, "Portuguese");
 
-	first_menu();
+	menu_principal();
+	
+	sleep(20);
 	
 	return 0;
 }

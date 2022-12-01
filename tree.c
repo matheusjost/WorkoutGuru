@@ -12,7 +12,7 @@ char menu_workout(){
 	printf("| [0] Sair                                     |\n");
 	printf("================================================\n");
 	
-	select_perguntas();
+	
 }
 
 char clicou_treino(){

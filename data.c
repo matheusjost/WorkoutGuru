@@ -44,24 +44,24 @@ void select_perguntas(){
 	
 	sqlite3_stmt *stmt;
 	
-    if (sqlite3_prepare_v2(db, "select * from PERGUNTAS", -1, &stmt, NULL)){
-	       printf("Error executing sql statement\n");
-	       sqlite3_close(db);
-	       exit(-1);
-	    }
-		
-	    sqlite3_bind_int (stmt, 1, 2);
-	    
-	    while (sqlite3_step(stmt) != SQLITE_DONE){
-	     	int col = 0;
-			for (col=0; col<sqlite3_column_count(stmt); col++){
-	          print_col_value(stmt, col);
-	        }
-	        printf("\n");
-	    }
-	    
-	    sqlite3_finalize(stmt);
-	    sqlite3_close(db);
+    if (sqlite3_prepare_v2(db, "SELECT * FROM PERGUNTAS", -1, &stmt, NULL)){
+       printf("Error executing sql statement\n");
+       sqlite3_close(db);
+       exit(-1);
+    }
+	
+    sqlite3_bind_int (stmt, 1, 2);
+    
+    if (sqlite3_step(stmt) != SQLITE_DONE){
+     	int col;
+		for (col=0; col<sqlite3_column_count(stmt); col++){
+          print_col_value(stmt, col);
+        }
+        printf("\n");
+    }
+    
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
 }
 /*
 int main(){

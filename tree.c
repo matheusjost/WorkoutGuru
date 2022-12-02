@@ -4,25 +4,79 @@
 #include <stdlib.h>
 #include "data.h"
 
-char menu_workout(){
-	printf("================================================\n");
-	printf("|                 WORKOUT GURU                 |\n");
-	printf("| [1] TESTE                                    |\n");
-	printf("| [2] Banco de dados [ADM]                     |\n");
-	printf("| [0] Sair                                     |\n");
-	printf("================================================\n");
+#define GRAU 6
+
+typedef struct tipo_no {
+    int resposta;
+    struct tipo_no *aponta[GRAU+1];
+    int x, y;
+} tipo_no;
+
+tipo_no *raiz;
+
+void inicializaArvore(){
+    raiz = malloc( sizeof( tipo_no ) );
+    memset( raiz, 0, sizeof( tipo_no ) );
+}
+
+void criar_treino(){
+	char answer;
 	
+	abre_db();
+	select_perguntas();
+	while(printa_perguntas()){
+		answer = getche();	
+	}
+	
+	fecha_db();	
+}
+
+void consultar_treino(){
 	
 }
 
-char clicou_treino(){
-	return '1';
+void excluir_treino(){
+	
+}
+
+char menu_workout(){
+	char op;
+	
+	system("cls");
+	
+	printf("================================================\n");
+	printf("|                 WORKOUT GURU                 |\n");
+	printf("| [1] Criar treino                             |\n");
+	printf("| [2] Consultar treinos                        |\n");
+	printf("| [3] Excluir treino                           |\n");
+	printf("| [0] Sair                                     |\n");
+	printf("================================================\n");
+	
+	op = getche();
+	
+	switch(op){
+		case '0':
+			exit(0);
+		case '1':
+			criar_treino();
+			break;
+		case '2':
+			consultar_treino();
+			break;
+		case '3':
+			excluir_treino();
+			break;
+	}
+}
+
+void menu_db(){
 	
 }
 
 void menu_principal(){
 	char op;
 	
+	printf("\n");
 	printf("================================================\n");
 	printf("|                 WORKOUT GURU                 |\n");
 	printf("| [1] Treinos                                  |\n");
@@ -30,7 +84,7 @@ void menu_principal(){
 	printf("| [0] Sair                                     |\n");
 	printf("================================================\n");
 	
-	op = clicou_treino();
+	op = getche();
 	
 	switch(op){
 		case '0':
@@ -39,13 +93,10 @@ void menu_principal(){
 			menu_workout();
 			break;
 		case '2':
-			break;
+			menu_db();
 	}
 }
 
-void get_perguntas(){
-	
-}
 
 int main (void){
 	setlocale(LC_ALL, "Portuguese");

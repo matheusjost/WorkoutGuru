@@ -2,294 +2,161 @@
 #include <string.h>
 #include <locale.h>
 #include <stdlib.h>
-#include "sqlite-amalgamation-3400000\sqlite3.h"
-
+#include <sqlite3.h>
 #define GRAU 6
 
+// estrutura para perguntas e treinos.
 typedef struct tipo_no {
-    int *treino;
-    int nro_repostas;
+	int codigo;
+    int treino;
+    char pergunta[100];
     struct tipo_no *aponta[GRAU+1];
+    int nro_chaves;
 } tipo_no;
 
 tipo_no *raiz;
-sqlite3 *db;
-sqlite3_stmt *stmt;
-sqlite3_stmt *stmtaux;
+sqlite3 *db; // variavel do banco de dados
+sqlite3_stmt *stmt; // variavel do statement do banco de dados
 
-void print_col_value(sqlite3_stmt* stmt, int col) {
+void inicializa_arvore(tipo_no**p){
+	// alocar memoria para iniciar a arvore
+    *p = NULL;
+} 
 
-  	int colType = sqlite3_column_type(stmt, col);
-
-	switch(colType){
-
-		case SQLITE_INTEGER:
-	         printf("%3d", sqlite3_column_int(stmt, col));
-	         break;
-	
-	    case SQLITE_FLOAT:
-	         printf("%5.2f", sqlite3_column_double(stmt, col));
-	         break;
-	
-	    case SQLITE_TEXT:
-	         printf("%-5s", sqlite3_column_text(stmt, col));
-	         break;
-	
-	    case SQLITE_NULL:
-	         printf("null");
-	         break;
-	
-	    case SQLITE_BLOB:
-	         printf("blob");
-	         break;
+void insere_recursivo(tipo_no **p, int codigo, int treino, const char *pergunta){
+	int i;
+	// insere
+	if((*p) == NULL)	{
+		tipo_no *no = (tipo_no*) malloc(sizeof(tipo_no));
+		strcpy(no->pergunta,pergunta);
+		no->codigo = codigo;
+		no->treino = treino;
+		for(i=0;i<GRAU;i++)
+			no->aponta[i] = NULL;
+		no->nro_chaves = 0;
+		*p = no;
+	}
+	else{
+		for( i = 0; i < (*p)->nro_chaves; i++ ){
+			if (codigo < (*p)->aponta[i]->codigo){
+				insere_recursivo(&(*p)->aponta[i],codigo,treino,pergunta);
+				return;	
+			}
+		}
+		if (codigo < (*p)->codigo){
+			insere_recursivo(&(*p)->aponta[(*p)->nro_chaves],codigo,treino,pergunta);	
+			(*p)->nro_chaves++;
+		}
 	}
 }
 
-int abre_db(){
+void inserir_dados(tipo_no **p){
+	// abre conexão com o db.
 	int saida = 0;
-	
 	saida = sqlite3_open("workout_guru.db", &db);
-	
 	if (saida){
 		printf("NAO FOI POSSIVEL CONECTAR AO BANCO: %s\n", sqlite3_errmsg(db));
-		return 0;
+		exit(0);
 	}
-	printf("CONECTADO AO BANCO.\n");	
-}
-
-void fecha_db(){	    
-    sqlite3_finalize(stmt);
-    sqlite3_close(db);	
-}
-
-void select_perguntas(){
-    if (sqlite3_prepare_v2(db, "SELECT Q FROM PERGUNTAS", -1, &stmt, NULL)){
+	//printf("CONECTADO AO BANCO.\n");
+	
+	// executa o sql para pegar as perguntas
+	if (sqlite3_prepare_v2(db, "SELECT Q FROM PERGUNTAS ORDER BY SEQ", -1, &stmt, NULL)){
        printf("Erro ao executar o select.\n");
        sqlite3_close(db);
-       exit(-1);
-    }	
-}
-
-int printa_perguntas(){
-	if (sqlite3_step(stmt) != SQLITE_DONE){
-     	printf("\n");
-        print_col_value(stmt, 0);
-        return 1;
+       exit(0);
     }
-    else
-    	return 0;
+	sqlite3_step(stmt); // prox linha
+	insere_recursivo(&(*p),43,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	sqlite3_step(stmt);	// prox linha
+	insere_recursivo(&(*p),7,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona perguna
+	insere_recursivo(&(*p),14,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),21,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),28,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),35,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),42,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	sqlite3_step(stmt); // prox linha
+	insere_recursivo(&(*p),3,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),6,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),10,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),13,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),17,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),20,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),24,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),27,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),31,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),34,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),38,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta
+	insere_recursivo(&(*p),41,0,(const char *)sqlite3_column_text(stmt,0)); // adiciona pergunta	
+	
+	insere_recursivo(&(*p),1,1,"");
+	insere_recursivo(&(*p),2,2,"");
+	insere_recursivo(&(*p),4,3,"");
+	insere_recursivo(&(*p),5,4,"");
+	insere_recursivo(&(*p),8,5,"");
+	insere_recursivo(&(*p),9,6,"");
+	insere_recursivo(&(*p),11,7,"");
+	insere_recursivo(&(*p),12,8,"");
+	insere_recursivo(&(*p),15,9,"");
+	insere_recursivo(&(*p),16,10,"");
+	insere_recursivo(&(*p),18,11,"");
+	insere_recursivo(&(*p),19,12,"");
+	insere_recursivo(&(*p),22,13,"");
+	insere_recursivo(&(*p),23,14,"");
+	insere_recursivo(&(*p),25,15,"");
+	insere_recursivo(&(*p),26,16,"");
+	insere_recursivo(&(*p),29,17,"");
+	insere_recursivo(&(*p),30,18,"");
+	insere_recursivo(&(*p),32,19,"");
+	insere_recursivo(&(*p),33,20,"");
+	insere_recursivo(&(*p),36,21,"");
+	insere_recursivo(&(*p),37,22,"");
+	insere_recursivo(&(*p),39,23,"");
+	insere_recursivo(&(*p),40,24,"");	
+	
+	sqlite3_close(db);
 }
-
-int get_recordcount(){
-	if (sqlite3_prepare_v2(db, "SELECT COUNT(Q) FROM PERGUNTAS", -1, &stmt, NULL)){
-       printf("Erro ao executar o select.\n");
-       sqlite3_close(db);
-       return -1;
-    }
-	else{
-		sqlite3_step(stmt);
-		return sqlite3_column_int(stmt, 0);	
+int gera_treino(tipo_no *p, int *respostas, int i){
+	// verifica se a arvore contem treino	
+	if (p != NULL){
+		if (p->treino != 0)
+			return p->treino;
+		else
+			gera_treino	(p->aponta[respostas[i]],respostas,i+1);
 	}	
 }
 
-int sql_possibleanswers(){
-	if (sqlite3_prepare_v2(db, "SELECT QTDANSWERS FROM PERGUNTAS", -1, &stmtaux, NULL)){
+const char* retorna_treino(tipo_no *p,int *respostas){
+	int treino;
+	// pega o sequencial do treino registrado no banco.
+	treino = gera_treino(p,respostas,0);
+	
+	// abre conexão com o db.
+	int saida = 0;
+	saida = sqlite3_open("workout_guru.db", &db);
+	if (saida){
+		printf("NAO FOI POSSIVEL CONECTAR AO BANCO: %s\n", sqlite3_errmsg(db));
+		exit(0);
+	}
+	//printf("CONECTADO AO BANCO.\n");
+	
+	// executa o sql.
+	if (sqlite3_prepare_v2(db, "SELECT DESCRICAO FROM TREINOS WHERE SEQ=?", -1, &stmt, NULL)){
        printf("Erro ao executar o select.\n");
        sqlite3_close(db);
-       return 0;
+       exit(0);
     }
-    else
-    	return 1;
-}
-
-int get_possibleanswers(){
-	if (sqlite3_step(stmtaux) != SQLITE_DONE)
-		return sqlite3_column_int(stmtaux, 0);	
-	else
-		return -1;
-}
-
-void inicializaArvore(){
-    raiz = malloc( sizeof( tipo_no ) );
-    memset( raiz, 0, sizeof( tipo_no ) );
-}
-
-/*void inserir( const int chave ){
-    int i;
-
-    inserirRecursivo( NULL, raiz, chave );
-}
-
-void inserirChaveNaFolha( tipo_no *folha, const int chave ){
-    int i, j, posicao;
-
-    posicao = folha->nro_chaves;
-    if( folha->nro_chaves>0 ){
-        for( i = 0; i < folha->nro_chaves; i++ ){
-            if( chave < folha->chaves[i] ){
-                posicao = i;
-                for( j = folha->nro_chaves; j > i; j-- ){
-                    folha->chaves[j] = folha->chaves[j-1];
-                    folha->aponta[j+1] = folha->aponta[j];
-                }
-                break;
-            }
-        }
-    }
-    folha->chaves[posicao] = chave;
-    folha->nro_chaves++;
-}
-
-void inserirRecursivo( tipo_no *paiRef, tipo_no *no, const int chave ){
-
-    bool isFolha = ( no->aponta[0] == NULL );
-    bool precisaDividir = false;
-    bool achouPelaEsquerda = false;
-
-    if( isFolha ){
-        inserirChaveNaFolha( no, chave );
-        precisaDividir = ( no->nro_chaves > MAX_ELEMENTOS );
-        if( precisaDividir ){
-            dividir( paiRef, no );
-        }
-        return;
-    } else {
-        int i;
-        for(i = 0; i < no->nro_chaves; i++ ){
-            if( chave < no->chaves[i] ){
-                achouPelaEsquerda = true;
-                inserirRecursivo( no, no->aponta[i], chave );
-                precisaDividir = ( no->nro_chaves > MAX_ELEMENTOS );
-                if(precisaDividir) dividir( paiRef, no );
-                break;
-            }
-        }
-        if( !achouPelaEsquerda ){
-            int ultimo = no->nro_chaves;
-            inserirRecursivo( no, no->aponta[ultimo], chave );
-            precisaDividir = ( no->nro_chaves > MAX_ELEMENTOS );
-            if( precisaDividir ) 
-				dividir( paiRef, no );
-        }
-    }
-}*/
-
-tipo_no* novoNodo() {
-    tipo_no *novo = malloc( sizeof( tipo_no ) );
-    memset( novo, 0, sizeof( tipo_no ) );
-    return novo;
-}
-
-void cria_arvore(tipo_no *no, sqlite3_stmt *stmts){
-	int i;
-	sqlite3_stmt *stmt1 = stmts;
-	
-	if(sqlite3_step(stmtaux) == SQLITE_ROW){
-		no->nro_repostas = sqlite3_column_int(stmtaux,0);
-		for(i = 0; i < no->nro_repostas; i++){
-			no->aponta[i] = novoNodo();
-			no->aponta[i]->treino = 0;
-			cria_arvore(no->aponta[i],stmtaux);
-		}
-		//sqlite3_step(stmts);
-		/*for (i = 0; i < no->nro_repostas; i++){
-			cria_arvore(no->aponta[i],stmts);
-		}*/
-	}
-	else{
-	}		
-}
-
-void criar_treino(tipo_no *no){
-	int answer, i, j, recordcount;
-	
-	abre_db();
-	recordcount = get_recordcount();
-	sql_possibleanswers();
-	cria_arvore(no,stmtaux);
-	select_perguntas();
-	while(printa_perguntas()){
-		answer = scanf("%i");	
-	}
-	
-	fecha_db();	
-}
-
-void consultar_treino(){
-	
-}
-
-void excluir_treino(){
-	
-}
-
-char menu_workout(){
-	char op;
-	
-	system("cls");
-	
-	printf("================================================\n");
-	printf("|                 WORKOUT GURU                 |\n");
-	printf("| [1] Criar treino                             |\n");
-	printf("| [2] Consultar treinos                        |\n");
-	printf("| [3] Excluir treino                           |\n");
-	printf("| [0] Sair                                     |\n");
-	printf("================================================\n");
-	
-	op = getche();
-	
-	switch(op){
-		case '0':
-			exit(0);
-		case '1':
-			criar_treino(raiz);
-			break;
-		case '2':
-			consultar_treino();
-			break;
-		case '3':
-			excluir_treino();
-			break;
-	}
-}
-
-void menu_db(){
-	
-}
-
-void menu_principal(){
-	char op;
-	
-	printf("\n");
-	printf("================================================\n");
-	printf("|                 WORKOUT GURU                 |\n");
-	printf("| [1] Treinos                                  |\n");
-	printf("| [2] Banco de dados [ADM]                     |\n");
-	printf("| [0] Sair                                     |\n");
-	printf("================================================\n");
-	
-	op = getche();
-	
-	switch(op){
-		case '0':
-			exit(0);
-		case '1':
-			menu_workout();
-			break;
-		case '2':
-			menu_db();
-	}
+    //adiciona o valor no parametro
+    sqlite3_bind_int(stmt,1,treino);
+    // acha a proxima linha
+	sqlite3_step(stmt);
+	return (const char *)sqlite3_column_text(stmt,0);	// retorna o valor contido em texto.
 }
 
 
-int main (void){
-	setlocale(LC_ALL, "Portuguese");
-	
-	inicializaArvore();
-
-	menu_principal();
-	
-	sleep(20);
-	
-	return 0;
+const char* carrega(tipo_no **p,int *respostas){
+	// função para ser chamada pela interface
+	inicializa_arvore(&(*p)); // inicia a arvore
+	inserir_dados(&(*p));
+	return retorna_treino(*p,respostas); // retorna o treino definido
 }

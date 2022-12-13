@@ -1,0 +1,2 @@
+https://docs.gtk.org/gtk3/index.html
+https://github.com/Losty17/warehouse-manager
